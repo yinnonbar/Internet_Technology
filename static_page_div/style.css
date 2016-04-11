@@ -1,0 +1,96 @@
+		body{
+
+			background-color: #99CCFF;
+			
+				
+		}
+
+		#profilePage {
+			font-family: arial;
+			font-size: 18px;
+			text-align: center;
+		}
+
+		#loginPage {
+			font-family: arial;
+			font-size: 18px;
+			text-align: center;
+		}
+
+
+   		#calcPage {
+			font-family: arial;
+			font-size: 18px;
+
+
+		}
+		
+		#button { 
+			background: #006ad9;
+			border: 0px; 
+			margin-top: 3px;
+	        color: #fff;
+	        font-size: 1em;
+   	 		border-radius: 20%;
+   			border:3px solid #cfdcea;
+   			font-weight: 700;		
+   		}
+
+   		#myimage { 
+	    	width: 350; 
+	    	height: 300; 
+		}
+
+		#loutBtn { 
+			background: #006ad9;
+			border: 0px; 
+			margin-top: 3px;
+	        color: #fff;
+	        font-size: 1em;
+   	 		border-radius: 20%;
+   			border:3px solid #cfdcea;
+   			font-weight: 700;		
+   		}
+
+
+		#loutBtn2 { 
+			background: #006ad9;
+			border: 0px; 
+			margin-top: 3px;
+	        color: #fff;
+	        font-size: 1em;
+   	 		border-radius: 20%;
+   			border:3px solid #cfdcea;
+   			font-weight: 700;		
+   		}
+
+   		#caBtn { 
+			background: #006ad9;
+			border: 0px; 
+			margin-top: 3px;
+	        color: #fff;
+	        font-size: 1em;
+   	 		border-radius: 20%;
+   			border:3px solid #cfdcea;
+   			font-weight: 700;		
+   		}  		
+
+   		#tableID {
+   			border: 3px;
+   		}
+
+
+   		#plusBtnID{
+
+   		}
+   		
+   		#createCalcBtnID{
+   			background: #006ad9;
+			border: 0px; 
+			margin-top: 3px;
+	        color: #fff;
+	        font-size: 1em;
+   	 		border-radius: 20%;
+   			border:3px solid #cfdcea;
+   			font-weight: 700;
+   		}
