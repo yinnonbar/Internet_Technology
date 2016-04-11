@@ -1,6 +1,6 @@
 var net = require('net');
-var parser = require('./hujiparser');
-var httpUtil = require('./hujiUtil');
+var parser = require('./parserHelper');
+var httpMod = require('./hujiModules');
 var fs = require('fs');
 var path = require('path');
 
@@ -16,14 +16,11 @@ function onHttpRequest(handlers, req, resp) {
         while (i < handlers.length) {
             var params = handlers[i].canHandle(req);
             if (params) {
-                //console.log(params);
                 req.params = params;
                 var handler = handlers[i].requestHandler;
                 try {
-                    //console.log('AAAA');
                     ++i;
                     handler(req, resp, next);
-                    //console.log("BBBB")
                     return;
                 } catch (e) {
                     console.log(e);
@@ -35,59 +32,59 @@ function onHttpRequest(handlers, req, resp) {
         }
 
         // no handlers matched
-        console.log("failed");
-        resp.status(404).send();
+
+        resp.status(404).send("The requested resource not found");
 
     }
 
     next();
 }
 
-function onSocketTimeout(socket) {
+function onsocTimeout(soc) {
 
-    socket.end();
+    soc.end();
 
 }
 
-function onBadHttpRequest(request, socket) {
+function onBadHttpRequest(request, soc) {
 
-    httpUtil.createResponse(request, socket, function () {
-        socket.end();
+    httpMod.createResponse(request, soc, function () {
+        soc.end();
     }).status(400).send();
 
 }
 
-function ServerWrapper(port, callback) {
+function ourServer(port, callback) {
 
     var that = this;
 
     this.handlers = [];
 
-    var server = net.createServer(function (socket) {
+    var server = net.createServer(function (soc) {
 
 
-        var bufferedParser = new parser.BufferedParser(function (e, req) {
+        var Parser = new parser.Parser(function (e, req) {
 
 
             if (e) {
-                onBadHttpRequest(req, socket);
+                onBadHttpRequest(req, soc);
             } else {
 
-                socket.setTimeout(2000, function () {
+                soc.setTimeout(2000, function () {
                     console.log("closing connection");
-                    socket.end();
+                    soc.end();
                 });
 
-                var resp = httpUtil.createResponse(req, socket, function () {
+                var resp = httpMod.createResponse(req, soc, function () {
 
                     var connectionHeader = req.get('CONNECTION');
 
                     if (req.httpVersion === 1.0 && connectionHeader && connectionHeader !== 'keep-alive') {
                         console.log("closing connection");
-                        socket.end();
+                        soc.end();
                     } else if (connectionHeader === 'Close') {
                         console.log("closing connection");
-                        socket.end();
+                        soc.end();
                     }
 
                 });
@@ -96,17 +93,17 @@ function ServerWrapper(port, callback) {
 
         });
 
-        socket.on('data', function (data) {
+        soc.on('data', function (data) {
 
 
-            socket.setTimeout(0);
-            bufferedParser.onDataReceived(data.toString());
+            soc.setTimeout(0);
+            Parser.onDataReceived(data.toString());
 
         });
 
-        socket.setTimeout(2000, function () {
+        soc.setTimeout(2000, function () {
 
-            onSocketTimeout(socket);
+            onsocTimeout(soc);
 
         });
 
@@ -135,7 +132,7 @@ function ServerWrapper(port, callback) {
 
 }
 
-ServerWrapper.prototype.addHandler = function (resource, requestHandler, method) {
+ourServer.prototype.addHandler = function (resource, requestHandler, method) {
 
     if (typeof resource === 'function') {
         requestHandler = resource;
@@ -162,10 +159,8 @@ function RequestHandler(resource, requestHandler, method) {
     this.requestHandler = requestHandler;
 
     // clean up resource
-    //console.log(resource);
-    //resource = path.normalize(resource).toString();
     resource = resource.toString();
-    //console.log(resource);
+
 
     // insert trailing slash
     if (resource[resource.length - 1] !== '/') {
@@ -229,9 +224,6 @@ function RequestHandler(resource, requestHandler, method) {
 RequestHandler.prototype.canHandle = function (req) {
 
     var path = req.path;
-    //console.log(req.path)
-
-    //console.log(this.resource.regex);
     var retVal = {};
 
 
@@ -240,7 +232,7 @@ RequestHandler.prototype.canHandle = function (req) {
         path = path + '/';
     }
 
-   // console.log(path);
+
     var match = path.match(this.resource.regex);
 
 
@@ -300,7 +292,7 @@ function createServerHandler(server) {
 
 exports.createServer = function (port, callback) {
 
-    var server = new ServerWrapper(port, function (err) {
+    var server = new ourServer(port, function (err) {
 
         if (err) {
             callback(err);

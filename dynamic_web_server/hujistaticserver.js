@@ -1,8 +1,8 @@
 /**
- * Created by danny on 11/01/15.
+ * Created by yinnon on 11/01/16.
  */
 var path = require('path');
-var httpUtil = require('./hujiUtil');
+var httpMod = require('./hujiModules');
 
 exports.static = function (route) {
 
@@ -14,7 +14,7 @@ exports.static = function (route) {
         var requestedResource = path.join(route, path.normalize(req.path));
         requestedResource = path.join(path.resolve(route, __dirname), requestedResource);
 
-        var content_type = httpUtil.getContentType(requestedResource);
+        var content_type = httpMod.getContentType(requestedResource);
         if (req.is(content_type)) {
 
             resp.sendFile(requestedResource, function (err) {
